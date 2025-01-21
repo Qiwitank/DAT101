@@ -22,7 +22,7 @@ const CurrencyTypes = {
     Pension: "Pensjonskonto",
   };
   
-  class TAccount {
+  class TAccount { //account class, and remember to comment your code for ease of navigation and description on why something is there
     #type;
     #balance;
     #withdrawCount;

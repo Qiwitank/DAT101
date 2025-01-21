@@ -14,6 +14,7 @@ if (wakeUpTime === ableBusTime) {
   printOut("i can catch the bus to school. ");
 } else {
   printOut("if i wake up at 7 o'clock i can take the bus, if not i have to take the train ");
+  
 } if (wakeUpTime === ableTrainTime) {
   printOut("if i wake up at 8 o'clock i can take the train, otherwise i have to take the car");
 }
