@@ -4,6 +4,8 @@ import libSound from "../../common/libs/libSound.mjs";
 import libSprite from "../../common/libs/libSprite.mjs";
 import THero from "./hero.mjs";
 import TObstacle from "./obstacle.mjs";
+import { TBait } from "./bait.mjs";
+import { TMenu } from "./menu.mjs";
 
 //--------------- Objects and Variables ----------------------------------//
 const chkMuteSound = document.getElementById("chkMuteSound");
@@ -22,7 +24,7 @@ export const SpriteInfoList = {
   ground:       { x:  246, y: 512, width: 1152, height: 114, count:  1 },
   numberSmall:  { x:  681, y: 635, width:   14, height:  20, count: 10 },
   numberBig:    { x:  422, y: 635, width:   24, height:  36, count: 10 },
-  buttonPLay:   { x: 1183, y: 635, width:  104, height:  58, count:  1 },
+  buttonPlay:   { x: 1183, y: 635, width:  104, height:  58, count:  1 },
   gameOver:     { x:    0, y: 384, width:  226, height: 114, count:  1 },
   infoText:     { x:    0, y: 630, width:  200, height:  55, count:  2 },
   food:         { x:    0, y: 696, width:   70, height:  65, count: 34 },
@@ -35,11 +37,16 @@ export const GameProps = {
   soundMuted: false,
   dayTime: true,
   speed: 1,
-  status: EGameStatus.playing, //For testing, normalt EGameStatus.idle
+  status: EGameStatus.idle, //For testing, normalt EGameStatus.idle
   background: null,
   ground: null,
   hero: null,
   obstacles: [],
+  baits: [],
+  menu: null,
+  score: 0,
+  bestScore: 0,
+  sounds: {countDown: null, food: null, gameOver: null, dead: null, running: null},
 };
 
 //--------------- Functions ----------------------------------------------//
@@ -65,18 +72,23 @@ function loadGame() {
   pos.y = 100;
   GameProps.hero = new THero(spcvs, SpriteInfoList.hero1, pos);
 
-  spawnObstacle();
+  GameProps.menu = new TMenu(spcvs);
+
+  //Load sounds
+  GameProps.sounds.running = new libSound.TSoundFile("./Media/running.mp3");
 
   requestAnimationFrame(drawGame);
   setInterval(animateGame, 10);
-}
+}// end of loadGame
 
 function drawGame() {
   spcvs.clearCanvas();
   GameProps.background.draw();
+  drawBait();
   drawObstacles();
   GameProps.ground.draw();
   GameProps.hero.draw();
+  GameProps.menu.draw();
   requestAnimationFrame(drawGame);
 }
 
@@ -84,6 +96,13 @@ function drawObstacles() {
   for (let i = 0; i < GameProps.obstacles.length; i++) {
     const obstacle = GameProps.obstacles[i];
     obstacle.draw();
+  }
+}
+
+function drawBait() {
+  for (let i = 0; i < GameProps.baits.length; i++) {
+    const bait = GameProps.baits[i];
+    bait.draw();
   }
 }
 
@@ -101,9 +120,16 @@ function animateGame() {
       }
       GameProps.hero.update();
       let delObstacleIndex = -1;
+      
       for (let i = 0; i < GameProps.obstacles.length; i++) {
         const obstacle = GameProps.obstacles[i];
         obstacle.update();
+        if(obstacle.right < GameProps.hero.left && !obstacle.hasPassed) {
+          //Congratulations, you have passed the obstacle
+          GameProps.menu.incScore(20);
+          console.log("Score: " + GameProps.score);
+          obstacle.hasPassed = true;
+        }
         if (obstacle.posX < -100) {
           delObstacleIndex = i;
         }
@@ -111,7 +137,26 @@ function animateGame() {
       if (delObstacleIndex >= 0) {
         GameProps.obstacles.splice(delObstacleIndex, 1);
       }
+    case EGameStatus.gameOver:
+      let delBaitIndex = -1;
+      const posHero = GameProps.hero.getCenter();
+      for (let i = 0; i < GameProps.baits.length; i++) {
+        const bait = GameProps.baits[i];
+        bait.update();
+        const posBait = bait.getCenter();
+        const dist = posHero.distanceToPoint(posBait);
+        if (dist < 15) {
+          delBaitIndex = i;
+        }
+      }
+      if (delBaitIndex >= 0) {
+        GameProps.baits.splice(delBaitIndex, 1);
+        GameProps.menu.incScore(10);
+      }
       break;
+      case EGameStatus.idle:
+        GameProps.hero.updateIdle();
+        break;
   }
 }
 
@@ -119,8 +164,35 @@ function spawnObstacle() {
   const obstacle = new TObstacle(spcvs, SpriteInfoList.obstacle);
   GameProps.obstacles.push(obstacle);
   //Spawn a new obstacle in 2-7 seconds
-  const seconds = Math.ceil(Math.random() * 5) + 2;
-  setTimeout(spawnObstacle, seconds * 1000);
+  if (GameProps.status === EGameStatus.playing) {
+    const seconds = Math.ceil(Math.random() * 5) + 2;
+    setTimeout(spawnObstacle, seconds * 1000);
+  }
+}
+
+function spawnBait() {
+  const pos = new lib2d.TPosition(SpriteInfoList.background.width, 100);
+  const bait = new TBait(spcvs, SpriteInfoList.food, pos);
+  GameProps.baits.push(bait);
+  //Generer nye baits hvert 0.5 til 1 sekund med step på 0.1
+  if (GameProps.status === EGameStatus.playing) {
+    const sec = Math.ceil(Math.random() * 5) / 10 + 0.5;
+    setTimeout(spawnBait, sec * 1000);
+  }
+}
+
+export function startGame() {
+  GameProps.status = EGameStatus.playing;
+  //Helten er død, vi må lage en ny helt!
+  GameProps.hero = new THero(spcvs, SpriteInfoList.hero1, new lib2d.TPosition(100, 100));
+  //Vi må slette alle hindringer og baits
+  GameProps.obstacles = [];
+  GameProps.baits = [];
+  GameProps.menu.reset();
+  spawnObstacle();
+  spawnBait();
+  //Spill av lyd
+  GameProps.sounds.running.play();
 }
 
 //--------------- Event Handlers -----------------------------------------//
