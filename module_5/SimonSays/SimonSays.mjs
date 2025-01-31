@@ -1,5 +1,8 @@
 "use strict";
 //--------------- Objects and Variables ----------------------------------//
+import lib2d from "../../common/libs/lib2d_v2.mjs";
+import libSprite from "../../common/libs/libSprite_v2.mjs";
+import {TColorButton} from "../SimonSays/colorbutton.mjs";
 
 // prettier-ignore
 export const SpriteInfoList = {
@@ -12,12 +15,61 @@ export const SpriteInfoList = {
   number:         { x: 0, y: 2344, width:  23, height:  34, count: 10, dst: { x: 365, y: 385}},
 };
 
-export const gameProps = {
+const cvs = document.getElementById("cvs");
+const spcvs = new libSprite.TSpriteCanvas(cvs);
 
-};
+export const gameProps = {
+  Background: new libSprite.TSprite(spcvs, SpriteInfoList.Background, new lib2d.TPoint(0,0)),
+  GameCenter: new lib2d.TPosition(SpriteInfoList.Background.width / 2, SpriteInfoList.Background.height / 2),
+  ColorButtons: [
+    new TColorButton(spcvs, SpriteInfoList.ButtonYellow),
+    new TColorButton(spcvs, SpriteInfoList.ButtonBlue),
+    new TColorButton(spcvs, SpriteInfoList.ButtonRed),
+    new TColorButton(spcvs, SpriteInfoList.ButtonGreen),],
+  sequence: [],
+  activeButton: null //Ingen aktive knapper i starten
+  };
+
 
 //--------------- Functions ----------------------------------------------//
+function loadGame(){
+  cvs.width = gameProps.Background.width;
+  cvs.height = gameProps.Background.height;
+  spawnSequence();
+  drawGame();
+}
 
+function drawGame(){
+  spcvs.clearCanvas();
+  gameProps.Background.draw();
+  //gameProps.ColorButton();
+  //Her må dere tegne alle Colorbuttons
+  for (let i = 0; i < gameProps.ColorButtons.length; i++){
+    gameProps.ColorButtons[i].draw();
+  }
+
+  requestAnimationFrame(drawGame);
+}
+
+function setMouseDown(){
+  gameProps.activeButtons.onMouseDown();
+  setTimeOut(setMouseUp, 1000);
+
+}
+
+function setMouseUp(){
+  gameProps.activeButton.onMouseUp();
+
+}
+
+function spawnSequence(){
+  const index = Math.floor(Math.random()) * gameProps.ColorButtons.length;
+  const button = gameProps.ColorButtons[index];
+  gameProps.sequence.push(button);
+  gameProps.activeButton = gameProps.sequence[0];
+  setTimeout(setMouseDown, 1000);
+}
 //--------------- Event Handlers -----------------------------------------//
 
 //--------------- Main Code ----------------------------------------------//
+spcvs.loadSpriteSheet("./media/spriteSheet.png", loadGame);
