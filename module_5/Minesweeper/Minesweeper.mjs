@@ -3,6 +3,7 @@ import lib2d from "../../common/libs/lib2d_v2.mjs";
 import libSprite from "../../common/libs/libSprite_v2.mjs";
 import { TGameBoard } from "./GameBoard.mjs";
 import { TTile, forEachTile } from "./Tile.mjs";
+import { TScoreBoard } from "./ScoreBoard.mjs";
 
 //-----------------------------------------------------------------------------------------
 //----------- variables and object --------------------------------------------------------
@@ -40,13 +41,14 @@ export const gameProps = {
   gameBoard: null,
   tiles: [],
   ScoreBoard: null,
+  openTiles: 0,
 };
 //-----------------------------------------------------------------------------------------
 //----------- functions -------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
 function loadGame() {
-  gameProps.ScoreBoard = new TScoreBoard(spcvs, SpriteInfoList);
   newGame();
+  gameProps.ScoreBoard = new TScoreBoard(spcvs);
   drawGame();
 }
 
@@ -55,6 +57,8 @@ export function newGame() {
   cvs.width = gameLevel.Tiles.Col * SpriteInfoList.ButtonTile.width + SpriteInfoList.Board.LeftMiddle.width + SpriteInfoList.Board.RightMiddle.width;
   cvs.height = gameLevel.Tiles.Row * SpriteInfoList.ButtonTile.height + SpriteInfoList.Board.TopMiddle.height + SpriteInfoList.Board.BottomMiddle.height;
   spcvs.updateBoundsRect();
+  spcvs.clearButtons();
+  gameProps.tiles = [];
   gameProps.gameBoard = new TGameBoard(spcvs, SpriteInfoList.Board, new lib2d.TPoint(0, 0));
   //Lag ny forekomst av TTile
   for (let row = 0; row < gameLevel.Tiles.Row; row++) {
@@ -75,6 +79,9 @@ export function newGame() {
       mineCounter++;
     }
   } while (mineCounter <= gameLevel.Mines);
+  if (gameProps.ScoreBoard !== null) {
+    gameProps.ScoreBoard.reset();
+  }
 }
 
 function drawGame() {
@@ -82,11 +89,26 @@ function drawGame() {
   gameProps.gameBoard.draw();
   //Husk å tegne forekomsten av TTile
   forEachTile(drawTile);
+  gameProps.ScoreBoard.draw();
   requestAnimationFrame(drawGame);
 }
 
 function drawTile(aTile) {
   aTile.draw();
+}
+
+export function setGameOver() {
+  //Stoppe Tiden.
+  //Åpne alle miner.
+  gameProps.ScoreBoard.stopTime();
+  forEachTile(openMines);
+}
+
+function openMines(aTile) {
+  if (aTile.isMine) {
+    aTile.reveal();
+  }
+  aTile.disable = true;
 }
 
 //-----------------------------------------------------------------------------------------

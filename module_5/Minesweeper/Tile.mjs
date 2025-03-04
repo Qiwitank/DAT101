@@ -1,60 +1,53 @@
 "use strict";
 import libSprite from "../../common/libs/libSprite_v2.mjs";
-import lib2d from "../../common/libs/lib2d_v2.mjs"
-import { gameProps, gameLevel} from "./Minesweeper.mjs";
+import lib2d from "../../common/libs/lib2d_v2.mjs";
+import { gameProps, gameLevel, setGameOver} from "./Minesweeper.mjs";
 
-const MineInfoColors = [
-  "blue",
-  "green",
-  "red",
-  "darkblue",
-  "brown",
-  "cyan",
-  "black",
-  "grey",
-];
+//Farger kan definers med enten tekst "black" eller kode "#000000"
+const MineInfoColors = ["blue", "green", "red", "darkblue", "brown", "cyan", "black", "grey"];
 
-class TCell{
-  constructor(aRow, aColumn){
+class TCell {
+  constructor(aRow, aColumn) {
     this.row = aRow;
-    this.col = aColumn; 
+    this.col = aColumn;
   }
 
-  get neighbors(){
+  get neighbors() {
     const rows = {
       from: this.row - 1,
-      to: this.row + 1
-    }
+      to: this.row + 1,
+    };
     const cols = {
       from: this.col - 1,
-      to: this.col + 1
-    }
-    if(rows.from < 0){
+      to: this.col + 1,
+    };
+    if (rows.from < 0) {
       rows.from = 0;
     }
-    if(cols.from < 0){
+    if (cols.from < 0) {
       cols.from = 0;
     }
-    if(rows.to >= gameLevel.Tiles.Row){
+    if (rows.to >= gameLevel.Tiles.Row) {
       rows.to = gameLevel.Tiles.Row - 1;
     }
-    if(cols.to >= gameLevel.Tiles.Col){
+    if (cols.to >= gameLevel.Tiles.Col) {
       cols.to = gameLevel.Tiles.Col - 1;
     }
     const neighbors = [];
-    for(let rowIndex = rows.from; rowIndex <= rows.to; rowIndex++ ){
+    for (let rowIndex = rows.from; rowIndex <= rows.to; rowIndex++) {
       const row = gameProps.tiles[rowIndex];
-      for(let colIndex = cols.from; colIndex <= cols.to; colIndex++){
-        const isThisTile = (this.row === rowIndex && this.col === colIndex);
-        if(this.row !== rowIndex && this.col !== colIndex){ //if(!isThisTile!)
+      for (let colIndex = cols.from; colIndex <= cols.to; colIndex++) {
+        const isThisTile = this.row === rowIndex && this.col === colIndex;
+        //ikke legg til seg selv!
+        if (!isThisTile) {
           const tile = row[colIndex];
           neighbors.push(tile);
         }
       }
     }
     return neighbors;
-  }// End of neighbors
-}// End of class
+  } // End of neighbors
+} // End of class
 
 export class TTile extends libSprite.TSpriteButton {
   #isMine;
@@ -63,7 +56,7 @@ export class TTile extends libSprite.TSpriteButton {
 
   constructor(aSpriteCanvas, aSpriteInfo, aRow, aColumn) {
     const cell = new TCell(aRow, aColumn);
-    const pos = new lib2d.TPoint(21,133);
+    const pos = new lib2d.TPoint(21, 133);
     pos.x += aSpriteInfo.width * cell.col;
     pos.y += aSpriteInfo.height * cell.row;
     super(aSpriteCanvas, aSpriteInfo, pos);
@@ -72,44 +65,84 @@ export class TTile extends libSprite.TSpriteButton {
     this.#mineInfo = 0;
   }
 
-  onMouseDown(aEvent){
+  onMouseDown(aEvent) {
+    if(aEvent.buttons === 2){
+      return
+    }else if(this.index === 3){
+      return;
+    }
+
     this.index = 1;
+    gameProps.ScoreBoard.spSmiley.index = 1;
   }
 
-  onMouseUp(aEvent){
-    if(this.#isMine){
-      this.index = 4;
-      //Game over :(
-    }else{
-      this.index = 2;
-      if(this.#mineInfo === 0 ){
-      const neighbors = this.#cell.neighbors;
-      for(let i = 0; i < neighbors.length; i++){
-        const neighbor = neighbors[i];
-        neighbor.OpenUp();
+  onMouseUp(aEvent) {
+    if(aEvent.button === 2){ 
+      if(this.index === 3){
+        this.index = 0;
+        //Her må dere øke mine telleren
+        gameProps.ScoreBoard.mineCounter++;
+      }else{
+        //Her må dere redusere mine telleren
+        if(gameProps.ScoreBoard.mineCounter > 0){
+          this.index = 3;
+          gameProps.ScoreBoard.mineCounter--;
+        }
       }
+      return;
+    }else if(this.index === 3){
+      return;
+    }
+
+    if (this.#isMine) {
+      this.index = 4;
+      gameProps.ScoreBoard.spSmiley.index = 2;
+      setGameOver();
+    } else {
+      this.index = 2;
+      this.disable = true;
+      gameProps.ScoreBoard.spSmiley.index = 0;
+      if (this.#mineInfo === 0) {
+        const neighbors = this.#cell.neighbors;
+        for (let i = 0; i < neighbors.length; i++) {
+          const neighbor = neighbors[i];
+          neighbor.OpenUp();
+        }
       }
     }
     this.disable = true;
+    //TODO: Sjekk om spillet er slutt!, Hint bruke forEachTile
+    gameProps.openTiles = 0;//Vi må resette denne, later som om vi ikke har noen åpnet enda
+    forEachTile(this.#countOpenTiles);
+    //Her er openTiles oppdatert med antall åpne miner
+    //Lag en if test, sjekk om det er flere tiles å åpne, hvis ikke så er spillet slutt!
+    const totalTiles = gameLevel.Tiles.Row * gameLevel.Tiles.Col;
+    const tilesLeft = totalTiles - gameProps.openTiles;
+    console.log(tilesLeft);
+    if(tilesLeft === gameLevel.Mines){
+      gameProps.ScoreBoard.spSmiley.index = 4;
+      setGameOver();
+    }
+
   }
 
-  onLeave(aEvent){
-    if(aEvent.buttons === 1){
+  onLeave(aEvent) {
+    if (aEvent.buttons === 1) {
       this.index = 0;
     }
   }
 
-  get isMine(){
+  get isMine() {
     return this.#isMine;
   }
 
-  set isMine(aValue){
+  set isMine(aValue) {
     this.#isMine = aValue;
-    if(aValue){
-      const neighbors = this.#cell.neighbors
+    if (aValue) {
+      const neighbors = this.#cell.neighbors;
       console.log(this.#cell);
       console.log(neighbors);
-      for(let i = 0; i < neighbors.length; i++){
+      for (let i = 0; i < neighbors.length; i++) {
         const neighbor = neighbors[i];
         neighbor.incMineInfo();
       }
@@ -117,39 +150,39 @@ export class TTile extends libSprite.TSpriteButton {
     }
   }
 
-  incMineInfo(){
-    if(this.#isMine){
+  incMineInfo() {
+    if (this.#isMine) {
       this.#mineInfo = 0;
-    }else{
-    this.#mineInfo++;
-   //console.log("Mine info: " + this.#mineInfo);
+    } else {
+      this.#mineInfo++;
     }
   }
 
-  onCustomDraw(aCTX){
-    if(this.isOpen){
-    if(this.#mineInfo > 0){
-      const posX = this.x + 17; 
-      const posY = this.y + 35; //mdn
-      aCTX.font = "30px serif";
-      aCTX.fillStyle = MineInfoColors[this.#mineInfo - 1];
-      aCTX.fillText(this.#mineInfo.toString(), posX, posY);
-    }
+  onCustomDraw(aCTX) {
+    if (this.isOpen) {
+      if (this.#mineInfo > 0) {
+        const posX = this.x + 17;
+        const posY = this.y + 35;
+        aCTX.font = "30px serif";
+        aCTX.fillStyle = MineInfoColors[this.#mineInfo - 1];
+        aCTX.fillText(this.#mineInfo.toString(), posX, posY);
+      }
     }
   }
 
-  get isOpen(){
-    if(this.index !== 0 && this.index !== 1) {
+  get isOpen() {
+    if (this.index !== 0 && this.index !== 1 && this.index !== 3) {
       return true;
     }
     return false;
   }
 
   OpenUp(){
-    if(this.isOpen){
+    if(this.isOpen || this.index === 3){
       return;
     }
     this.index = 2;
+    this.disable = true;
     if(this.#mineInfo === 0){
       const neighbors = this.#cell.neighbors;
       for(let i = 0; i < neighbors.length; i++){
@@ -159,20 +192,36 @@ export class TTile extends libSprite.TSpriteButton {
     }
   }
 
-}// End of class TTile 
+  reveal(){
+    if(this.isOpen){
+      return;
+    }
+    this.index = 2;
+    if(this.#isMine){
+      this.index = 5;
+    }
+  }
 
-export function forEachTile(aCallBack){
-  if(!aCallBack){
+  #countOpenTiles(aTile){
+    if(!aTile.isOpen){
+      return;
+    }
+    gameProps.openTiles++;
+  }
+
+} // End of class TTile
+
+export function forEachTile(aCallBack) {
+  if (!aCallBack) {
     console.error("Missing callback function in forEachTile method");
     return;
   }
   const tiles = gameProps.tiles;
-  for(let row = 0; row < tiles.length; row++){
+  for (let row = 0; row < tiles.length; row++) {
     const rows = tiles[row];
-    for(let col = 0; col < rows.length; col++){
+    for (let col = 0; col < rows.length; col++) {
       const tile = rows[col];
       aCallBack(tile);
     }
   }
-
 }
