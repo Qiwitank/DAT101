@@ -5,7 +5,7 @@ const movieList =[
     "director": "Greta Gerwig",
     "year": 2023,
     "genre": ["Comedy"],
-    "rating": 7.9
+    "rating": 7
   },
   {
     "title": "Spirited Away",
@@ -26,7 +26,7 @@ const movieList =[
     "director": "Gary Ross",
     "year": 2012,
     "genre": ["Sci-fi", "Drama", "Young Adult"],
-    "rating": 9.9
+    "rating": 10
   },
   {
     "title": "Chasing Coral",
@@ -47,14 +47,14 @@ const movieList =[
     "director": "Ron Howard",
     "year": 2000,
     "genre": ["Comedy"],
-    "rating": 9.7
+    "rating": 8.7
   },
   {
     "title": "Grease",
     "director": "Randal Kleiser",
     "year": 1978,
     "genre": ["Romance"],
-    "rating": 6.8
+    "rating": 6
   },
   {
     "title": "My best friend's wedding",
@@ -68,7 +68,7 @@ const movieList =[
     "director": "Jon Favreau",
     "year": 2008,
     "genre": ["Action", "Sci-Fi"],
-    "rating": 9.3
+    "rating": 10
   }
 ];
 
