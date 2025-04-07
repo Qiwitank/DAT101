@@ -1,7 +1,7 @@
 "use strict";
-import lib2d from "../../common/libs/lib2d.mjs";
-import libSound from "../../common/libs/libSound.mjs";
-import libSprite from "../../common/libs/libSprite.mjs";
+import lib2d from "../../../DAT101/common/libs/lib2d.mjs";
+import libSound from "../../../DAT101/common/libs/libSound.mjs";
+import libSprite from "../../../DAT101/common/libs/libSprite.mjs";
 import { SpriteInfoList, GameProps, EGameStatus, startGame } from "./FlappyBird.mjs";
 
 /*
