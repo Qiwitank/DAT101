@@ -107,3 +107,84 @@ function cmbTask3CheckAnswerClick() {
   txtTask3Output.innerHTML = text;
   text = ""; 
 }
+
+// --- Part 4 ----------------------------------------------------------------------------------------------
+const divTask4Cars = document.getElementById("divTask4Cars");
+const txtTask4Output = document.getElementById("txtTask4Output");
+
+// Create radio buttons dynamically
+CarTypes.forEach(car => {
+  const label = document.createElement("label");
+  const radio = document.createElement("input");
+  radio.type = "radio";
+  radio.name = "carType";
+  radio.value = car.caption;
+
+  radio.addEventListener("change", () => {
+    txtTask4Output.innerHTML = "You selected: " + car.caption;
+  });
+
+  label.appendChild(radio);
+  label.appendChild(document.createTextNode(" " + car.caption));
+  divTask4Cars.appendChild(label);
+  divTask4Cars.appendChild(document.createElement("br"));
+});
+
+// --- Part 5 ----------------------------------------------------------------------------------------------
+const selectTask5Animals = document.getElementById("selectTask5Animals");
+const txtTask5Output = document.getElementById("txtTask5Output");
+
+selectTask5Animals.addEventListener("change", () => {
+  const selectedAnimal = selectTask5Animals.options[selectTask5Animals.selectedIndex].text;
+  txtTask5Output.innerHTML = "You selected: " + selectedAnimal;
+});
+
+//  --- Part 6 ----------------------------------------------------------------------------------------------
+const selectTask6Girls = document.getElementById("selectTask6Girls");
+const txtTask6Output = document.getElementById("txtTask6Output");
+
+// Populate dropdown
+GirlsNames.forEach(name => {
+  const option = document.createElement("option");
+  option.value = name;
+  option.text = name;
+  selectTask6Girls.add(option);
+});
+
+// Event on change
+selectTask6Girls.addEventListener("change", () => {
+  const selectedName = selectTask6Girls.value;
+  txtTask6Output.innerHTML = "You selected: " + selectedName;
+});
+
+// --- Part 7 ----------------------------------------------------------------------------------------------
+const selectMovieGenre = document.getElementById("selectMovieGenre");
+const cmbAddMovie = document.getElementById("cmbAddMovie");
+const tblMovies = document.getElementById("tblMovies");
+
+// Populate genre dropdown
+MovieGenre.forEach(genre => {
+  const option = document.createElement("option");
+  option.value = genre;
+  option.text = genre;
+  selectMovieGenre.add(option);
+});
+
+let movieCounter = 1;
+
+cmbAddMovie.addEventListener("click", () => {
+  const title = document.getElementById("txtMovieTitle").value;
+  const genre = selectMovieGenre.value;
+  const director = document.getElementById("txtMovieDirector").value;
+  const rate = document.getElementById("txtMovieRate").value;
+
+  const row = tblMovies.insertRow(-1);
+  row.innerHTML = `
+    <td>${movieCounter}</td>
+    <td>${title}</td>
+    <td>${genre}</td>
+    <td>${director}</td>
+    <td>${rate}</td>
+  `;
+  movieCounter++;
+});

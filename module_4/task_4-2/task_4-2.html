@@ -10,8 +10,38 @@
       <span id="txtOut" style="white-space: nowrap"></span>
     </div>
     <ol>
-      <li>[Write the question here, and copy this for more questions]</li>
-      <p>[Write your answer here, and copy this for more answers]</p>
+      <li>[What is an array?]</li>
+      <p>[An array is a type of variable that stores mutiple values in a single place. It's like a list.]</p>
+      <li>[What does it mean to "hardcore" when we talk about programming?]</li>
+      <p>[To "hardcore" something means writing fixed values directly into the code, instead of calculating 
+        or dynamically retrieving them.]</p>
+      <li>[Explain in plain text what happpens in task 3, and how we can traverse (iterate) the array
+        when we (humans) don't "know" how long the array is.]</li>
+      <p>[In task 3, a sentence is used to split into words usinf ".split("")", which turns the string into array
+        of words.Then we use two methods, ".every()" and ".forEach()", to go through each word and print its index and
+        content. We don't need to know the array's length because these methods handle iteration automatically.]</p>
+      <li>[Why is it beneficial to store instances of a class in arrays, as in task 4?]</li>
+      <p>[Storing class instances (like "TBook" objects) in an array helps organize related data in a structured way. 
+        This makes it easy to loop through them, sort them, or search for specific objects. It's more powerful than using
+        separate variables for each book.]</p>
+      <li>[Try your best to explain EWeekDays object from task 7. How do we use the "value" attribute, for example?
+        In what way do "WeekDay", "Workdays", which would contain "Monday", "Wednesday", and "Thursday", how would
+        it ideally look?]</li>
+      <p>["EWeekDays" os an object that uses binary values to represent days of the week, which lets you combine days using bitwise
+        operations. The "value" attribute is a unique number for each day. "Workdays" combines several days (Mon-Fri) by adding their values. 
+        An ideal "Workdays" array might look like "[EWeekDays.WeekDay1, EWeekDays.WeekDay3,EWeekDays.WeekDay4]" for Monday, Wednesday, and Thursday.]</p>
+      <li>[In task 8, we will use a "callback" routine when sorting. Explain how such a "callback" woutine works.]</li>
+      <p>[A callback is a function passed into another function. In sorting, the callback decides the order of elements. The "sortRandomValues" function
+        compares two numbers at a time and returns a value that tells ".sort()" which one should come first.]</p>
+      <li>[What happens in the sorting routines you have created? try to explain how the array can figure out if an element should come before
+        of after another. The best wat to answer this is to print both parameters each time the sorting routine runs.]</li>
+      <p>[In the sort routine, JavaScript compares two elements at a time. The callback returns a negative number if the first
+        should come before the second, zero if they're equal, and a positive number if it should come after. You can add a "console.log(aValue1, aValue2)" in the
+        callback to see the comparisons.]</p>
+      <li>[In task 10, we will create an array with rows and columns. Explain what the first element of the array contains.]</li>
+      <p>[The first element of the "myTable" array is another array (the first row), and it contains strings like ""0,0","0,1", up to "0,8"", representing cells
+        in that row. It's basically a table structure: an array of arrays.]</p>
+
     </ol>
     <script type="module" src="./task_4-2.mjs" defer></script>
   </body>

@@ -97,8 +97,15 @@
   </div>
 </fieldset>
 <ol>
-  <li>[Write the question here, and copy this for more questions]</li>
-  <p>[Write your answer here, and copy this for more answers]</p>
+  <li>[In this assignment, we use the DOM. Explain how this library can help us develop interactive web pages.]</li>
+  <p>The DOM (Document Object Model) lets JavaScript interact with and modify the structure and content of web pages. It allows developers to dynamically change elements, respond to user input, and create interactive features without reloading the page.</p>
+    <li>[What is an event? Simply explain what happens when we add an event listener to an object.]</li>
+    <p>An event is an action or occurrence in the browser, like clicking a button or pressing a key. When we add an event listener to an object, we are telling the browser to run a specific function when that event happens on the object.</p>
+    <li>[Sometimes we need to use an event object to get data from the event. Explain how this event object is structured, don't explain all functions or attributes.]</li>
+    <p>The event object is automatically passed to event listener functions and contains information about what triggered the event. For example, in a keyboard event, <code>event.key</code> tells which key was pressed. In a mouse event, <code>event.clientX</code> and <code>event.clientY</code> give the position of the cursor. <code>event.target</code> refers to the element that caused the event.</p>
+    <li>[Explain the main difference between DOM id and DOM name. Can we have identical IDs?]</li>
+    <p>An <code>id</code> is a unique identifier for a single HTML element, while a <code>name</code> can be shared by multiple elements, typically used in forms. IDs must be unique in a document—using the same ID more than once can cause unexpected behavior and make element selection unreliable.</p>
+    
 </ol>
 <script type="module" src="./task_4-3.mjs" defer></script>
 </body>
