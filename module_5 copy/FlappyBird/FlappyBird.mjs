@@ -1,7 +1,7 @@
 "use strict";
-import lib2d from "../../../DAT101/common/libs/lib2d.mjs";
-import libSound from "../../../DAT101/common/libs/libSound.mjs";
-import libSprite from "../../../DAT101/common/libs/libSprite.mjs";
+import lib2d from "../../common/libs/lib2d.mjs";
+import libSound from "../../common/libs/libSound.mjs";
+import libSprite from "../../common/libs/libSprite.mjs";
 import THero from "./hero.mjs";
 import TObstacle from "./obstacle.mjs";
 import { TBait } from "./bait.mjs";
@@ -210,11 +210,9 @@ function setSoundOnOff() {
 function setDayNight() {
   if (rbDayNight[0].checked) {
     GameProps.dayTime = true;
-    GameProps.background.index;
     console.log("Day time");
   } else {
     GameProps.dayTime = false;
-    GameProps.background.index;
     console.log("Night time");
   }
 } // end of setDayNight
