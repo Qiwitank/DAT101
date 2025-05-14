@@ -2,7 +2,7 @@
 import lib2d from "../../common/libs/lib2d.mjs";
 import libSprite from "../../common/libs/libSprite.mjs";
 import { GameProps, EGameStatus } from "./FlappyBird.mjs";
-
+ 
 class THero extends libSprite.TSprite {
   #spi;
   #gravity = 9.81 / 100;
@@ -16,11 +16,11 @@ class THero extends libSprite.TSprite {
     this.rotation = 0;
     this.#sineWave = new lib2d.TSineWave(1.5, 2);
   }
-
+ 
   draw() {
     super.draw();
   }
-
+ 
   update() {
     const groundY = GameProps.ground.posY;
     const bottomY = this.posY + this.#spi.height;
@@ -39,15 +39,17 @@ class THero extends libSprite.TSprite {
       GameProps.sounds.running.stop();
     }
   }
-
+ 
   flap() {
     this.#velocity = -3;
   }
-
+ 
   updateIdle(){
     this.translate(0, this.#sineWave.value);
   }
-
+ 
 }
-
+ 
 export default THero;
+ 
+ 

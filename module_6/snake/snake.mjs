@@ -4,8 +4,9 @@
 //------------------------------------------------------------------------------------------
 import libSprite from "../../common/libs/libSprite_v2.mjs";
 import lib2D from "../../common/libs/lib2d_v2.mjs";
-import { GameProps, SheetData, bateIsEaten } from "./game.mjs"
+import { GameProps, SheetData, baitIsEaten } from "./game.mjs"
 import { TBoardCell, EBoardCellInfoType } from "./gameBoard.mjs";
+import { TMenu } from "./menu.mjs";
 
 //------------------------------------------------------------------------------------------
 //----------- variables and object ---------------------------------------------------------
@@ -76,7 +77,7 @@ class TSnakeHead extends TSnakePart {
     //Check if the snake head is on a bait cell
     const boardCellInfo = GameProps.gameBoard.getCell(this.boardCell.row, this.boardCell.col);
     if(boardCellInfo.infoType === EBoardCellInfoType.Bait) {
-      bateIsEaten();
+      baitIsEaten();
     }else{
       /* Decrease the score if the snake head is not on a bait cell */
     }
@@ -97,8 +98,13 @@ class TSnakeHead extends TSnakePart {
 class TSnakeBody extends TSnakePart {
   constructor(aSpriteCanvas, aBoardCell ) {
     super(aSpriteCanvas, SheetData.Body, aBoardCell);
-    this.index = ESpriteIndex.RL;    
-  }
+    this.index = ESpriteIndex.RL;  
+    }
+    getCell() {
+      return this.boardCell;
+    }
+    
+  
 
   update(){
     let spriteIndex = ESpriteIndex.RL;
@@ -180,16 +186,21 @@ class TSnakeBody extends TSnakePart {
     newBody.direction = this.direction;
     return newBody;
   }
-
 } // class TSnakeBody
 
 
 class TSnakeTail extends TSnakePart {
-  constructor(aSpriteCanvas, aCol, aRow) {
-    super(aSpriteCanvas, SheetData.Tail, aCol, aRow);
+  constructor(aSpriteCanvas,aBoardCell) {
+    super(aSpriteCanvas, SheetData.Tail, aBoardCell);
+  }
+  getCell() {
+    return this.boardCell;
   }
 
   update(){
+    let boardCellInfo = GameProps.gameBoard.getCell(this.boardCell.row, this.boardCell.col);
+    boardCellInfo.infoType = EBoardCellInfoType.Empty; // Clear the cell, before moving the tail
+  
     switch (this.direction) {
       case EDirection.Up:
         this.boardCell.row--;
@@ -204,9 +215,8 @@ class TSnakeTail extends TSnakePart {
         this.boardCell.row++;
         break;
     }
-    const boardCellInfo = GameProps.gameBoard.getCell(this.boardCell.row, this.boardCell.col);
-    boardCellInfo.infoType = EBoardCellInfoType.Empty; // Clear the cell, when the tail moves
-    this.direction = boardCellInfo.direction;
+    boardCellInfo = GameProps.gameBoard.getCell(this.boardCell.row, this.boardCell.col);
+    this.direction = boardCellInfo.direction; // Update the direction of the tail based on the new cell
     this.index = this.direction;
     super.update();
   }
@@ -219,11 +229,15 @@ export class TSnake {
   #head = null;
   #body = null;
   #tail = null;
+  #shouldGrow = false;
   constructor(aSpriteCanvas, aBoardCell) {
     this.#head = new TSnakeHead(aSpriteCanvas, aBoardCell);
     let col = aBoardCell.col - 1;
-    this.#body = [new TSnakeBody(aSpriteCanvas, new TBoardCell(col, aBoardCell.row))];
+    const part1 = [new TSnakeBody(aSpriteCanvas, new TBoardCell(col, aBoardCell.row))];
     col--;
+    const part2 = [new TSnakeBody(aSpriteCanvas, new TBoardCell(col, aBoardCell.row))];
+    col--;
+    this.#body = [...part1, ...part2];
     this.#tail = new TSnakeTail(aSpriteCanvas, new TBoardCell(col, aBoardCell.row));
   } // constructor
 
@@ -236,22 +250,44 @@ export class TSnake {
   } // draw
 
   //Returns true if the snake is alive
-  update(){
-    if (this.#isDead) {
-      return false; // Snake is dead, do not continue
-    }
-    if(this.#head.update()) {
+  update() {
+    if (this.#isDead) return false;
+
+    if (this.#head.update()) {
+      // Oppdater kroppen
       for (let i = 0; i < this.#body.length; i++) {
         this.#body[i].update();
       }
-      this.#tail.update();  
-    }else if(!this.#isDead){
-      this.#isDead = true;
-      return false; // Collision detected, do not continue
-    }
-    return true; // No collision, continue
-  }
 
+      if (this.#shouldGrow) {
+        // Legg til en ny kroppsdelscelle på halen sin posisjon
+        const tailPos = this.#tail.getCell();
+        const newPart = new TSnakeBody(this.#tail.spcvs, new TBoardCell(tailPos.col, tailPos.row));
+        newPart.direction = this.#tail.direction;
+        newPart.index = this.#tail.index;
+        this.#body.push(newPart);
+
+        // Sett flagget til false for å indikere at veksten er fullført
+        this.#shouldGrow = false;
+
+        // Ikke flytt halen denne runden
+      } else {
+        // Flytt halen bare hvis vi ikke vokser
+        this.#tail.update();
+      }
+    } else {
+      this.#isDead = true;
+      return false;
+    }
+
+    return true;
+  } 
+  // Add a new body part to the snake
+  grow() {
+    this.#shouldGrow = true;
+    // Create a new body part at the tail position. Klarer ikke å flytte på
+  } 
+  
   setDirection(aDirection) {
     this.#head.setDirection(aDirection);
   } // setDirection
