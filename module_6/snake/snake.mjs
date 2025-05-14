@@ -281,7 +281,8 @@ export class TSnake {
     }
 
     return true;
-  } 
+  }
+
   // Add a new body part to the snake
   grow() {
     this.#shouldGrow = true;

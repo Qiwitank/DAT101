@@ -243,6 +243,8 @@ class TSprite {
     //Create a shape object based on the shape class, or use default rectangle shape
     if(!aPoint) aPoint = new lib2D.TPoint(0, 0);
     this.shape = aShapeClass ? new aShapeClass(aPoint, aSpriteInfo.width, aSpriteInfo.height) : new lib2D.TRectangle(aPoint, aSpriteInfo.width, aSpriteInfo.height, lib2D.EShapeType.Rectangle);
+    this.pos = aPoint;
+    this.scale = 1.0;
     this.#index = 0;
     this.animateSpeed = 0;
     this.#speedIndex = 0;

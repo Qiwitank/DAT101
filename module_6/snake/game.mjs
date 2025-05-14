@@ -4,11 +4,11 @@
 //----------- Import modules, mjs files  ---------------------------------------------------
 //-----------------------------------------------------------------------------------------
 import libSprite from "../../common/libs/libSprite_v2.mjs";
-import lib2D from "../../common/libs/lib2d_v2.mjs"; // Add this line
 import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
 import { TSnake, EDirection } from "./snake.mjs";
 import { TBait } from "./bait.mjs";
 import { TMenu } from "./menu.mjs";
+
 //-----------------------------------------------------------------------------------------
 //----------- variables and object --------------------------------------------------------
 //-----------------------------------------------------------------------------------------
@@ -30,7 +30,6 @@ export const SheetData = {
   Retry:    { x: 614, y: 995, width: 169, height: 167, count:  1 },
   Resume:   { x:   0, y: 357, width: 202, height: 202, count: 10 },
   Number:   { x:   0, y: 560, width:  81, height:  86, count: 10 },
-  Pause:    { x:   0, y: 0, width: 202, height: 202, count: 1  },
 };
 
 export const GameProps = {
@@ -40,7 +39,6 @@ export const GameProps = {
   bait: null,
   menu: null,
   ticksSinceLastBait: 0,
-  paused: false,
 };
 
 //------------------------------------------------------------------------------------------
@@ -48,6 +46,8 @@ export const GameProps = {
 //------------------------------------------------------------------------------------------
 
 export function newGame() {
+  console.log("New game started!");
+  GameProps.gameStatus = EGameStatus.Playing; // change game status to Idle
   GameProps.gameBoard = new TGameBoard();
   GameProps.snake = new TSnake(spcvs, new TBoardCell(5, 5));
   GameProps.bait = new TBait(spcvs);
@@ -106,10 +106,11 @@ function drawGame() {
       GameProps.menu.draw(); // Tegn menyen (inkludert scoren)
       GameProps.bait.draw();
       GameProps.snake.draw();
-      drawPause();
       break;
 
     case EGameStatus.GameOver:
+      GameProps.bait.draw();
+      GameProps.snake.draw(); // Tegn slangen
       GameProps.menu.draw(); // Tegn Game Over-menyen (inkludert scoren)
       break;
   }
@@ -119,10 +120,6 @@ function drawGame() {
 }
 
 function updateGame() {
-  if (GameProps.paused) {
-    GameProps.menu.drawPause(); // Tegn pause-menyen
-    return; // Avslutt oppdateringen hvis spillet er på pause
-  }
   // Update game logic here
   switch (GameProps.gameStatus) {
     case EGameStatus.Playing:
@@ -139,14 +136,6 @@ function updateGame() {
       break;
     case EGameStatus.Idle:
       break;
-    case " ":
-      if (GameProps.gameStatus === EGameStatus.Playing) {
-        GameProps.gameStatus = EGameStatus.Pause;
-        console.log("Game paused!");
-      } else if (GameProps.gameStatus === EGameStatus.Pause) {
-        GameProps.gameStatus = EGameStatus.Playing;
-        console.log("Game resumed!");
-      }
   }
 }
 
@@ -159,20 +148,6 @@ function increaseGameSpeed() {
     hndUpdateGame = setInterval(updateGame, 1500 / gameSpeed);
   }
 }
-
-function drawPause() {
-  console.log("Drawing pause animation...");
-  const pauseSprite = new libSprite.TSprite(
-    spcvs,
-    { ...SheetData.Pause },
-    new lib2D.TPoint(
-      spcvs.width / 2 - SheetData.Pause.width / 2,
-      spcvs.height / 2 - SheetData.Pause.height / 2
-    )
-  );
-  pauseSprite.draw();
-}
-
 
 //-----------------------------------------------------------------------------------------
 //----------- Event handlers --------------------------------------------------------------
@@ -191,7 +166,7 @@ function onKeyDown(event) {
       break;
     case "ArrowRight":
       GameProps.snake.setDirection(EDirection.Right);
-      break;  
+      break;
     case " ":
       /* Pause game logic here */
       if (GameProps.gameStatus === EGameStatus.Playing) {
@@ -201,15 +176,29 @@ function onKeyDown(event) {
         GameProps.gameStatus = EGameStatus.Playing;
         console.log("Game resumed!");
       }
+
       break;
   }
 }
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Space") {
-    GameProps.paused = !GameProps.paused; // Toggle pause state
+document.addEventListener("click", onMouseClick);
+
+function onMouseClick(event) {
+  const rect = cvs.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top; 
+
+  if (GameProps.gameStatus === EGameStatus.GameOver) {
+    if (GameProps.menu.isHomeClicked(x, y)) {
+      console.log("Home clicked!");
+      GameProps.gameStatus = EGameStatus.Idle;
+    } else if (GameProps.menu.isRetryClicked(x, y)) {
+      console.log("Retry clicked!");
+      GameProps.gameStatus = EGameStatus.Playing;
+      newGame();
+    }
   }
-});
+}
 //-----------------------------------------------------------------------------------------
 //----------- main -----------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
