@@ -47,14 +47,19 @@ export const GameProps = {
 
 export function newGame() {
   console.log("New game started!");
-  GameProps.gameStatus = EGameStatus.Playing; // change game status to Idle
+  GameProps.gameStatus = EGameStatus.Playing;
+
   GameProps.gameBoard = new TGameBoard();
   GameProps.snake = new TSnake(spcvs, new TBoardCell(5, 5));
   GameProps.bait = new TBait(spcvs);
   GameProps.menu = new TMenu(spcvs);
   GameProps.menu.updateScore(0);
-  GameProps.ticksSinceLastBait = 0; // Nullstill telleren
+  GameProps.ticksSinceLastBait = 0;
   gameSpeed = 4;
+
+  // Start game loop på nytt:
+  if (hndUpdateGame) clearInterval(hndUpdateGame);
+  hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed);
 }
 
 export function baitIsEaten() {
@@ -79,14 +84,13 @@ function loadGame() {
   cvs.width = GameBoardSize.Cols * SheetData.Head.width;
   cvs.height = GameBoardSize.Rows * SheetData.Head.height;
 
-  GameProps.gameStatus = EGameStatus.Playing; // change game status to Idle
+  GameProps.gameStatus = EGameStatus.Idle; // change game status to Idle
 
   /* Create the game menu here */
 
   newGame(); // Call this function from the menu to start a new game, remove this line when the menu is ready
 
   console.log("Game canvas is rendering!");
-  hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); // Update game every 1000ms / gameSpeed
   console.log("Game canvas is updating!");
   requestAnimationFrame(drawGame);
 }
@@ -96,22 +100,26 @@ function drawGame() {
   spcvs.clearCanvas();
 
   switch (GameProps.gameStatus) {
+    case EGameStatus.Idle:
+      GameProps.menu.draw();
+      break;
+
     case EGameStatus.Playing:
-      GameProps.menu.draw(); // Tegn scoren først
       GameProps.bait.draw();
-      GameProps.snake.draw(); // Slangen tegnes over scoren
+      GameProps.snake.draw();
+      GameProps.menu.draw();
       break;
 
     case EGameStatus.Pause:
-      GameProps.menu.draw(); // Tegn menyen (inkludert scoren)
       GameProps.bait.draw();
       GameProps.snake.draw();
+      GameProps.menu.draw();
       break;
 
     case EGameStatus.GameOver:
       GameProps.bait.draw();
-      GameProps.snake.draw(); // Tegn slangen
-      GameProps.menu.draw(); // Tegn Game Over-menyen (inkludert scoren)
+      GameProps.snake.draw();
+      GameProps.menu.draw();
       break;
   }
 
@@ -190,13 +198,47 @@ function onMouseClick(event) {
 
   if (GameProps.gameStatus === EGameStatus.GameOver) {
     if (GameProps.menu.isHomeClicked(x, y)) {
-      console.log("Home clicked!");
       GameProps.gameStatus = EGameStatus.Idle;
     } else if (GameProps.menu.isRetryClicked(x, y)) {
-      console.log("Retry clicked!");
-      GameProps.gameStatus = EGameStatus.Playing;
       newGame();
     }
+  } else if (GameProps.gameStatus === EGameStatus.Idle) {
+    if (GameProps.menu.isPlayClicked(x, y)) {
+      newGame();
+    }
+  } else if (GameProps.gameStatus === EGameStatus.Pause) {
+    if (GameProps.menu.isResumeClicked(x, y)) {
+      GameProps.gameStatus = EGameStatus.Playing;
+    }
+  }
+}
+/* Vi lagde denne fordi når vi endret knappene til TSpriteButton, så var det litt bugs. */
+document.addEventListener("mousemove", onMouseMove);
+function onMouseMove(event) {
+  const rect = cvs.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  if (GameProps.gameStatus === EGameStatus.GameOver) {
+    if (GameProps.menu.isHomeClicked(x, y) || GameProps.menu.isRetryClicked(x, y)) {
+      cvs.style.cursor = "pointer";
+    } else {
+      cvs.style.cursor = "default";
+    }
+  } else if (GameProps.gameStatus === EGameStatus.Idle) {
+    if (GameProps.menu.isPlayClicked(x, y)) {
+      cvs.style.cursor = "pointer";
+    } else {
+      cvs.style.cursor = "default";
+    }
+  } else if (GameProps.gameStatus === EGameStatus.Pause) {
+    if (GameProps.menu.isResumeClicked(x, y)) {
+      cvs.style.cursor = "pointer";
+    } else {
+      cvs.style.cursor = "default";
+    }
+  } else {
+    cvs.style.cursor = "default";
   }
 }
 //-----------------------------------------------------------------------------------------

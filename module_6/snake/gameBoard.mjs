@@ -38,13 +38,12 @@ export class TGameBoard {
       }
       this.gameBoard.push(row);
     }
-  } // End of constructor
+  } 
 
   getCell(aRow, aCol) {
     if (aRow < 0 || aRow >= this.rows || aCol < 0 || aCol >= this.cols) {
       return null;
     }
     return this.gameBoard[aRow][aCol];
-  } // End of getCell
-}// End of class TGameBoard
-//------------------------------------------------------------------------------------------
+  } 
+}
