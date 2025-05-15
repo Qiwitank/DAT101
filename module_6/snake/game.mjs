@@ -96,9 +96,9 @@ function loadGame() {
 }
 
 function drawGame() {
-  // Clear the canvas
   spcvs.clearCanvas();
 
+// Denne delen gjør slik at vi kan tegne snaken og baiten på brettet. I tillegg til at snaken kommer bak scoren. 
   switch (GameProps.gameStatus) {
     case EGameStatus.Idle:
       GameProps.menu.draw();
@@ -189,6 +189,7 @@ function onKeyDown(event) {
   }
 }
 
+// Her har vi fått hjelp fra AI til å lage en klikk-funksjon på menyen.
 document.addEventListener("click", onMouseClick);
 
 function onMouseClick(event) {

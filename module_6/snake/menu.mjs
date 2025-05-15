@@ -58,14 +58,13 @@ drawScore(x = 350, y = 470, scale = 0.4, rightAlign = false, alpha = 1.0) {
     const scoreString = this.score.toString();
     const digitWidth = SheetData.Number.width * scale;
     let startX = x;
-
     if (rightAlign) {
       startX = x - digitWidth * scoreString.length;
     }
-
     for (let i = 0; i < scoreString.length; i++) {
       const digit = parseInt(scoreString[i]);
-      const digitSprite = new libSprite.TSprite(this.#spcvs, { ...SheetData.Number, x: SheetData.Number.x + digit * SheetData.Number.width }, new lib2D.TPoint(startX + i * digitWidth, y));
+      const digitSprite = new libSprite.TSprite(this.#spcvs, 
+        { ...SheetData.Number, x: SheetData.Number.x + digit * SheetData.Number.width }, new lib2D.TPoint(startX + i * digitWidth, y));
       digitSprite.scale = scale;
       digitSprite.alpha = alpha;
       digitSprite.draw();
@@ -100,7 +99,6 @@ draw() {
     const h = SheetData.Retry.height * this.#spRetry.scale;
     return mouseX >= pos.x && mouseX <= pos.x + w && mouseY >= pos.y && mouseY <= pos.y + h;
   }
-
   isHomeClicked(mouseX, mouseY) {
     const pos = this.#spHome.pos;
     const w = SheetData.Home.width * this.#spHome.scale;

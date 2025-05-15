@@ -1,9 +1,5 @@
 "use strict";
-
 import { EDirection } from "./snake.mjs";
-import { TMenu } from "./menu.mjs";
-import { EGameStatus } from "./game.mjs";
-
 
 export const GameBoardSize = { Cols: 24, Rows: 18 };
 
