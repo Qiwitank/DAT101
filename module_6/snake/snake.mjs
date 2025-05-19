@@ -68,7 +68,7 @@ class TSnakeHead extends TSnakePart {
     this.direction = this.newDirection;
     this.index = this.direction;
     if (this.checkCollision()) {
-      return false; // kollisjon
+      return false; // collision
     }
     super.update();
     const boardCellInfo = GameProps.gameBoard.getCell(this.boardCell.row, this.boardCell.col);
@@ -78,7 +78,7 @@ class TSnakeHead extends TSnakePart {
       boardCellInfo.infoType = EBoardCellInfoType.Empty;
     }
     boardCellInfo.infoType = EBoardCellInfoType.Snake; 
-    return true; // ingen kollisjon
+    return true; // no collision
   }
 
   checkCollision() {
@@ -251,7 +251,7 @@ update() {
   if (this.#isDead) return false;
 
   if (this.#head.update()) {
-    // 👇 Klon før kroppen flytter seg, så vi beholder riktig posisjon
+    // Cloning before the body moves, so we keep the right position
     let clonePart = null;
     if (this.#shouldGrow) {
       const lastBodyPart = this.#body[this.#body.length - 1];
@@ -259,12 +259,12 @@ update() {
       this.#shouldGrow = false;
     }
 
-    // 👉 Nå flyttes kroppen
+    // here the body moves
     for (let i = 0; i < this.#body.length; i++) {
       this.#body[i].update();
     }
 
-    // 👉 Legg til ny kroppsdelsklone
+    //adding a new bodypart 
     if (clonePart) {
       this.#body.push(clonePart);
     } else {
@@ -285,4 +285,5 @@ update() {
   setDirection(aDirection) {
     this.#head.setDirection(aDirection);
   } 
-} // I TSnake update er en del laget av AI. Vi sleit mye med å få til at slangen skulle vokse, og vi fikk det til ved å bruke en klon av den siste kroppsdelen.
+} 
+// In TSnake update, a part was made by AI. We struggled a lot to get the snake to grow, and we got it to work by using a clone of the last body part.

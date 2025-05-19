@@ -36,12 +36,12 @@ export class TMenu {
     this.#spResume = new libSprite.TSprite(aSpriteCanvas, SheetData.Resume, new lib2D.TPoint(385, 250));
     this.#spResume.scale = 0.7;
   }
-/* Laget med AI.
-Dette gjør knappene Play og Resume til animerte knapper ved hjelp av en timer. */
+/* Made with AI.
+This makes the play and resume buttons animated with a timer*/
   animateButtons() {
     this.#animationCounter++;
 
-    if (this.#animationCounter % 8 === 0) { // Juster hastigheten her
+    if (this.#animationCounter % 8 === 0) { // change speed here
       this.#playFrame = (this.#playFrame + 1) % SheetData.Play.count;
       this.#resumeFrame = (this.#resumeFrame + 1) % SheetData.Resume.count;
     }
@@ -92,7 +92,7 @@ draw() {
   }
 }
 
-/* Fått hjelp av AI til å lage disse "click"-funksjonene */
+/*AI helped making the click-functions */
   isRetryClicked(mouseX, mouseY) {
     const pos = this.#spRetry.pos;
     const w = SheetData.Retry.width * this.#spRetry.scale;

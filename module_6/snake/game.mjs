@@ -73,7 +73,7 @@ export function baitIsEaten() {
 
   GameProps.ticksSinceLastBait = 0;
 
-  increaseGameSpeed(); // Øk spillhastigheten
+  increaseGameSpeed(); // increase game speed
 }
 
 //------------------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ function loadGame() {
 function drawGame() {
   spcvs.clearCanvas();
 
-// Denne delen gjør slik at vi kan tegne snaken og baiten på brettet. I tillegg til at snaken kommer bak scoren. 
+//Here we can draw the snake and the bait on the board. Also that the snake is showing behind the score. 
   switch (GameProps.gameStatus) {
     case EGameStatus.Idle:
       GameProps.menu.draw();
@@ -189,7 +189,7 @@ function onKeyDown(event) {
   }
 }
 
-// Her har vi fått hjelp fra AI til å lage en klikk-funksjon på menyen.
+// AI helped making a click-funksjon on the menu.
 document.addEventListener("click", onMouseClick);
 
 function onMouseClick(event) {
@@ -213,7 +213,7 @@ function onMouseClick(event) {
     }
   }
 }
-/* Vi lagde denne fordi når vi endret knappene til TSpriteButton, så var det litt bugs. */
+/*We made this function because when we changed the buttons in TSpriteButton, there were bugs*/
 document.addEventListener("mousemove", onMouseMove);
 function onMouseMove(event) {
   const rect = cvs.getBoundingClientRect();

@@ -21,7 +21,7 @@ export class TBait extends libSprite.TSprite {
   } 
 
   update() {
-    // Her spawner baiten på et tilfeldig sted på brettet 
+    // the bait spawn here randomly on the board
     do{
       this.#boardCell.col = Math.floor(Math.random() * GameProps.gameBoard.cols);
       this.#boardCell.row = Math.floor(Math.random() * GameProps.gameBoard.rows);
