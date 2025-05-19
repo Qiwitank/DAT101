@@ -237,7 +237,7 @@ export class TSnake {
     col--;
     this.#body = [...part1, ...part2];
     this.#tail = new TSnakeTail(aSpriteCanvas, new TBoardCell(col, aBoardCell.row));
-  } 
+  } // constructor
 
   draw() {
     this.#head.draw();
@@ -245,45 +245,45 @@ export class TSnake {
       this.#body[i].draw();
     }
     this.#tail.draw();
-  }
+  } // draw
 
-update() {
-  if (this.#isDead) return false;
+  //Returns true if the snake is alive
+  update() {
+    if (this.#isDead) return false;
 
-  if (this.#head.update()) {
-    // Cloning before the body moves, so we keep the right position
-    let clonePart = null;
-    if (this.#shouldGrow) {
-      const lastBodyPart = this.#body[this.#body.length - 1];
-      clonePart = lastBodyPart.clone();
-      this.#shouldGrow = false;
-    }
+    if (this.#head.update()) {
+      // Clone the last body part before the tail moves
+      let clonePart = null;
+      if (this.#shouldGrow) {
+        const lastBodyPart = this.#body[this.#body.length - 1];
+        clonePart = lastBodyPart.clone();
+        this.#shouldGrow = false;
+      }
 
-    // here the body moves
-    for (let i = 0; i < this.#body.length; i++) {
-      this.#body[i].update();
-    }
+      for (let i = 0; i < this.#body.length; i++) {
+        this.#body[i].update();
+      }
 
-    //adding a new bodypart 
-    if (clonePart) {
-      this.#body.push(clonePart);
+      // puts in cloned part
+      if (clonePart) {
+        this.#body.push(clonePart);
+      } else {
+        this.#tail.update();
+      }
     } else {
-      this.#tail.update();
+      this.#isDead = true;
+      return false;
     }
-  } else {
-    this.#isDead = true;
-    return false;
-  }
 
-  return true;
-} 
+    return true;
+  }
 
   grow() {
     this.#shouldGrow = true;
-  } 
-  
+  }
+
   setDirection(aDirection) {
     this.#head.setDirection(aDirection);
-  } 
-} 
+  } // setDirection
+}
 // In TSnake update, a part was made by AI. We struggled a lot to get the snake to grow, and we got it to work by using a clone of the last body part.
